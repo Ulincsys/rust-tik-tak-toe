@@ -3,23 +3,29 @@ fn main() {
 	let mut board: [[u8; 3]; 3] = [[0; 3]; 3];
 	let mut player: u8 = 1;
 	let mut result: (bool, usize, usize);
+	let mut moves = 1;
 	loop {
 		print_board(&board);
-		
+		println!("Player {}!", player);
 		result = get_input(&mut board, player);
 		while !result.0 {
 			result = get_input(&mut board, player);
 		}
 		if is_solved(&board, result.1, result.2) {
+			print_board(&board);
+			println!("\nGood job player {}!\n", player);
+			break
+		} else if moves == 9 {
+			print_board(&board);
+			println!("\nDRAW!\n");
 			break
 		} else if player == 1 {
 			player = 2;
 		} else {
 			player = 1;
 		}
+		moves += 1;
 	}
-	print_board(&board);
-	println!("\n\nGood job player {}!", player);
 }
 
 fn line_v(board: &[[u8; 3]], col: usize, player: u8) -> bool {
@@ -56,7 +62,10 @@ fn get_input(board: &mut[[u8; 3]], player: u8) -> (bool, usize, usize) {
 	fprint("Enter column: ");
 	let col: String = readline().unwrap();
 	let col = to_index(col.chars().next().unwrap());
-	let row = row.parse::<usize>().unwrap();
+	let row = match row.parse::<usize>() {
+		Ok(n) => n,
+		Err(_n) => 3
+	};
 	if !check_indices(row, col) {
 		println!("Incorrect input");
 		(false, row, col)
@@ -74,14 +83,11 @@ fn check_indices(x: usize, y: usize) -> bool {
 }
 
 fn to_index(c: char) -> usize {
-	if c == 'a' || c == 'A' {
-		0
-	} else if c == 'b' || c == 'B' {
-		1
-	} else if c == 'c' || c == 'C' {
-		2
-	} else {
-		3
+	match c {
+		'a' | 'A' => 0,
+		'b' | 'B' => 1,
+		'c' | 'C' => 2,
+		_ => 3
 	}
 }
 
